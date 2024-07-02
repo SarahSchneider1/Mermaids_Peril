@@ -4,7 +4,7 @@ class Character extends MovableObject {
     width = 200;
     x = 100;
     y = 100;
-    speed = 3;
+    speed = 5;
     IMAGES_MOVE = [
         'img/Mermaid/PNG/Mermaid_1/Move_001.png',
         'img/Mermaid/PNG/Mermaid_1/Move_002.png',
@@ -43,6 +43,7 @@ class Character extends MovableObject {
             if (this.world.keyboard.UP) {
                 this.y -= this.speed;
             }
+            this.world.camera_x = -this.x;
         }, 1000 / 60);
 
         setInterval(() => { // Move animation
@@ -52,6 +53,6 @@ class Character extends MovableObject {
                 this.img = this.imageCache[path];
                 this.currentImage++;
             }
-        }, 140);
+        }, 100);
     }
 }

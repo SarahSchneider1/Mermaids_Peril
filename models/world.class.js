@@ -1,27 +1,11 @@
 class World {
     character = new Character();
-    enemies = [
-        new Fish(),
-        new Fish(),
-        new Fish2(),
-        new Fish2(),
-        new Fish(),
-        new Crab(),
-        new Crab(),
-        new Jellyfish(),
-        new Jellyfish()
-    ];
-    backgroundObjects = [
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/1.png', 0),
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/2.png', 0),
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/3.png', 0),
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/4.png', 0),
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/5.png', 0),
-        new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/6.png', 0)
-    ];
+    enemies = level1.enemies;
+    backgroundObjects = level1.backgroundObjects;
     canvas;
     ctx;
     keyboard;
+    camera_x =  0;
 
     constructor(canvas, keyboard) {
         this.ctx = canvas.getContext('2d');
@@ -39,9 +23,13 @@ class World {
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Clear canvas
 
+        this.ctx.translate(this.camera_x, 0);
+
         this.addObjectsToMap(this.backgroundObjects);
         this.addToMap(this.character); // Add character to map
         this.addObjectsToMap(this.enemies);
+
+        this.ctx.translate(-this.camera_x, 0);
 
         requestAnimationFrame(this.draw);
     }
@@ -51,9 +39,20 @@ class World {
             this.addToMap(o);
         });
     }
+
+
     addToMap(mo) {
         if (mo.img) {
-            this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+            this.ctx.save(); // Canvas-Kontext speichern
+            if (mo.otherDirection) {
+                this.ctx.scale(-1, 1); // Horizontal spiegeln
+                this.ctx.drawImage(mo.img, -mo.x - mo.width, mo.y, mo.width, mo.height);
+            } else {
+                this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+            }
+            this.ctx.restore(); // Canvas-Kontext wiederherstellen
         }
     }
+    
+    
 }
