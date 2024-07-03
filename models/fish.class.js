@@ -19,8 +19,8 @@ class Fish extends MovableObject {
     constructor() {
         super().loadImage('img/Fish, crab, jellyfish, shark/PNG/Fish_2/Fish_move_2_000.png');
         
-        this.x = 200 + Math.random() * 500;
-        this.y = 100 + Math.random() * 500;
+        this.x = 200 + Math.random() * 2500;
+        this.y = 0 + Math.random() * (480 - 150);
 
         this.loadImages(this.IMAGES_MOVE);
         this.animate();

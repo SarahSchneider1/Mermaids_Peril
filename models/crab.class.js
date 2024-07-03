@@ -22,7 +22,7 @@ class Crab extends MovableObject {
         this.loadImages(this.IMAGES_MOVE);
 
         // Startposition und Geschwindigkeit zufällig festlegen
-        this.x = 10 + Math.random() * 500;
+        this.x = 10 + Math.random() * 2500;
         this.speed = 0.15 + Math.random() * 0.25;
 
         this.animate();

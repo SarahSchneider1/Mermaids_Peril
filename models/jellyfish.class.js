@@ -1,6 +1,6 @@
 class Jellyfish extends MovableObject {
-    height = 100;
-    width = 100;
+    height = 90;
+    width = 90;
     IMAGES_MOVE = [
         'img/Fish, crab, jellyfish, shark/PNG/Jellyfish_1/Jellyfish_move_1_000.png',
         'img/Fish, crab, jellyfish, shark/PNG/Jellyfish_1/Jellyfish_move_1_001.png',
@@ -19,10 +19,11 @@ class Jellyfish extends MovableObject {
         super();
         this.loadImage('img/Fish, crab, jellyfish, shark/PNG/Jellyfish_1/Jellyfish_move_1_000.png');
         
-        this.x = 200 + Math.random() * 500;
-        this.y = 100 + Math.random() * 500;
+        this.x = 200 + Math.random() * 2500;
+        this.y = 100;
 
-        this.currentImage = 0; // Initialisierung von currentImage
+
+        this.currentImage = 0; 
         this.speed = 1; // Initialisierung der Geschwindigkeit
         this.direction = 1; // Richtung der Bewegung: 1 für runter, -1 für hoch
 
@@ -55,7 +56,7 @@ class Jellyfish extends MovableObject {
         this.y += this.speed * this.direction;
 
         // Umkehrung der Bewegungsrichtung bei Erreichen der Grenzen
-        if (this.y >= 300 || this.y <= 100) {
+        if (this.y >= 400 || this.y <= 100) {
             this.direction *= -1;
         }
     }
