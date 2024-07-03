@@ -21,22 +21,29 @@ class MovableObject {
             this.imageCache[path] = img;
         });
     }
-
     moveRight() {
-        console.log('Moving Right');
+        setInterval(() => {
+            this.x += this.speed;
+            this.otherDirection = false;
+        }, 1000 / 60);
     }
 
     moveLeft() {
         setInterval(() => {
             this.x -= this.speed;
+            this.otherDirection = true;
         }, 1000 / 60);
     }
 
     moveUp() {
-        
+        setInterval(() => {
+            this.y -= this.speed;
+        }, 1000 / 60);
     }
 
     moveDown() {
-        
+        setInterval(() => {
+            this.y += this.speed;
+        }, 1000 / 60);
     }
 }

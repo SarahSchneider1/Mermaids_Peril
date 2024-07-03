@@ -19,6 +19,10 @@ class Character extends MovableObject {
     ];
     currentImage = 0;
     world;
+    move_sound = new Audio ('audio/gamesound.mp3');
+
+
+
 
     constructor() {
         super();
@@ -29,22 +33,28 @@ class Character extends MovableObject {
 
     animate() {
         setInterval(() => { // Charakter bewegen
+            this.move_sound.pause();
             if (this.world.keyboard.RIGHT && this.x <this.world.level.level_end_x) {
                 this.x += this.speed;
                 this.otherDirection = false;
+                this.move_sound.play();
             }
             if (this.world.keyboard.LEFT && this.x > 0) {
                 this.x -= this.speed;
                 this.otherDirection = true;
+                this.move_sound.play();
             }
             if (this.world.keyboard.DOWN) {
                 this.y += this.speed;
+                this.move_sound.play();
             }
             if (this.world.keyboard.UP) {
                 this.y -= this.speed;
+                this.move_sound.play();
             }
             this.world.camera_x = -this.x + 100;
         }, 1000 / 60);
+
 
         setInterval(() => { // Move animation
             if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT || this.world.keyboard.UP || this.world.keyboard.DOWN) {
