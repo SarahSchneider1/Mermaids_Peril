@@ -18,14 +18,11 @@ class Character extends MovableObject {
         'img/Mermaid/PNG/Mermaid_1/Move_000.png'
     ];
     currentImage = 0;
-    world;
-    move_sound = new Audio ('audio/gamesound.mp3');
+    move_sound = new Audio('audio/gamesound.mp3');
 
-
-
-
-    constructor() {
+    constructor(world) {
         super();
+        this.world = world;
         this.loadImage('img/Mermaid/PNG/Mermaid_1/Move_000.png');
         this.loadImages(this.IMAGES_MOVE);
         this.animate();
@@ -34,7 +31,7 @@ class Character extends MovableObject {
     animate() {
         setInterval(() => { // Charakter bewegen
             this.move_sound.pause();
-            if (this.world.keyboard.RIGHT && this.x <this.world.level.level_end_x) {
+            if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.x += this.speed;
                 this.otherDirection = false;
                 this.move_sound.play();
@@ -55,13 +52,10 @@ class Character extends MovableObject {
             this.world.camera_x = -this.x + 100;
         }, 1000 / 60);
 
-
+        
         setInterval(() => { // Move animation
             if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT || this.world.keyboard.UP || this.world.keyboard.DOWN) {
-                let i = this.currentImage % this.IMAGES_MOVE.length;
-                let path = this.IMAGES_MOVE[i];
-                this.img = this.imageCache[path];
-                this.currentImage++;
+                this.playAnimation(this.IMAGES_MOVE);
             }
         }, 100);
     }

@@ -43,8 +43,7 @@ class Jellyfish extends MovableObject {
     animate() {
         setInterval(() => {
             // Bildwechsel in der Animation
-            this.img = this.imageCache[this.IMAGES_MOVE[this.currentImage]];
-            this.currentImage = (this.currentImage + 1) % this.IMAGES_MOVE.length;
+            this.playAnimation(this.IMAGES_MOVE);
         }, 100); // Bildwechselintervall
 
         setInterval(() => {

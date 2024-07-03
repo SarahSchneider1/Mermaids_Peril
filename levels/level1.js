@@ -8,7 +8,8 @@ const level1 = new Level(
     new Crab(),
     new Crab(),
     new Jellyfish(),
-    new Jellyfish()
+    new Jellyfish(),
+    new Endboss()
 ],
 [
 new BackgroundObject('img/Game Backgrounds/Backgrounds_2/PNG/2_game_background/layers/1.png', -720),
