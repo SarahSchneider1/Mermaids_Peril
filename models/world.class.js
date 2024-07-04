@@ -13,18 +13,43 @@ class World {
         this.keyboard = keyboard;
         this.draw = this.draw.bind(this);
         this.setWorld();
-        this.startBackgroundMusic();
+        this.addEventListeners(); // Event-Listener hinzufügen
         this.draw();
+        this.checkCollisions();
     }
 
     setWorld() {
         this.character.world = this;
     }
 
+    checkCollisions() {
+        setInterval(() => {
+            this.level.enemies.forEach((enemy) => {
+                if (this.character.isColliding(enemy)) {
+                    this.character.hit();
+                    console.log('Collision with character, energy:', this.character.energy);
+                }
+            });
+        }, 200);
+    }
+
+    addEventListeners() {
+        // Event-Listener für Benutzerinteraktionen hinzufügen
+        document.addEventListener('click', () => {
+            this.startBackgroundMusic();
+        }, { once: true });
+
+        document.addEventListener('keydown', () => {
+            this.startBackgroundMusic();
+        }, { once: true });
+    }
+
     startBackgroundMusic() {
         this.backgroundMusic.loop = true; // Musik in einer Schleife abspielen
-        this.backgroundMusic.volume = 0.0; // Lautstärke auf 50% setzen
-        this.backgroundMusic.play();
+        this.backgroundMusic.volume = 0.5; // Lautstärke auf 50% setzen
+        this.backgroundMusic.play().catch(error => {
+            console.log('Audio playback failed:', error);
+        });
     }
 
     draw() {
@@ -48,15 +73,7 @@ class World {
     }
 
     addToMap(mo) {
-        if (mo.img) {
-            this.ctx.save(); // Canvas-Kontext speichern
-            if (mo.otherDirection) {
-                this.ctx.scale(-1, 1); // Horizontal spiegeln
-                this.ctx.drawImage(mo.img, -mo.x - mo.width, mo.y, mo.width, mo.height);
-            } else {
-                this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
-            }
-            this.ctx.restore(); // Canvas-Kontext wiederherstellen
-        }
+        mo.drawImage(this.ctx);
+        mo.drawFrame(this.ctx);
     }
 }

@@ -5,23 +5,22 @@ const level1 = new Level(
     new Fish(),
     new Fish(),
     new Fish(),
-    new Fish(),
-    new Fish(),
+
 
     new Fish2(),
     new Fish2(),
     new Fish2(),
-    new Fish2(),
+
   
     new Crab(),
     new Crab(),
     new Crab(),
-    new Crab(),
+
 
     new Jellyfish(),
     new Jellyfish(),
     new Jellyfish(),
-    new Jellyfish(),
+
 
     new Endboss()
 ],

@@ -28,7 +28,6 @@ window.addEventListener("keydown", (e) => {
     if(e.keyCode == 32) { // 32 ist der korrekte keyCode für die Leertaste
         keyboard.SPACE = true;
     }
-    console.log(e);
 });
 
 window.addEventListener("keyup", (e) => {
@@ -47,5 +46,4 @@ window.addEventListener("keyup", (e) => {
     if(e.keyCode == 32) { // 32 ist der korrekte keyCode für die Leertaste
         keyboard.SPACE = false;
     }
-    console.log(e);
 });
