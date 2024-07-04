@@ -21,7 +21,7 @@ class Crab extends MovableObject {
         this.loadImage('img/Fish, crab, jellyfish, shark/PNG/Crab_1/Crab_move_1_000.png');
         this.loadImages(this.IMAGES_MOVE);
 
-        // Startposition und Geschwindigkeit zufällig festlegen
+        // Startposition zufällig festlegen
         this.x = 10 + Math.random() * 2500;
         this.speed = 0.15 + Math.random() * 0.25;
 
@@ -32,14 +32,6 @@ class Crab extends MovableObject {
         setInterval(() => {
             // Bildwechsel in der Animation
             this.playAnimation(this.IMAGES_MOVE);
-        }, 100); // Bildwechselintervall
-
-        setInterval(() => {
-            this.moveLeft();
-        }, 1000 / 60); // Bewegungstakt
-    }
-
-    moveLeft() {
-        this.x -= this.speed;
+        }, 200); // Bildwechselintervall
     }
 }

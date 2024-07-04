@@ -4,7 +4,9 @@ class Character extends MovableObject {
     width = 200;
     x = 100;
     y = 100;
-    speed = 10;
+    speed = 30;
+    canvasWidth = 720;
+    canvasHeight = 480;
     IMAGES_MOVE = [
         'img/Mermaid/PNG/Mermaid_1/Move_001.png',
         'img/Mermaid/PNG/Mermaid_1/Move_002.png',
@@ -30,13 +32,14 @@ class Character extends MovableObject {
         'img/Mermaid/PNG/Mermaid_1/Idle_009.png'
     ];
     currentImage = 0;
-    move_sound = new Audio('audio/gamesound.mp3');
     hasMoved = false;
+    idleInterval = null; // Referenz auf das Idle-Intervall
+    maxRight = 2400;
 
     constructor(world) {
         super();
         this.world = world;
-        this.loadImage('img/Mermaid/PNG/Mermaid_1/Move_000.png');
+        this.loadImage(this.IMAGES_IDLE[0]);
         this.loadImages(this.IMAGES_MOVE);
         this.loadImages(this.IMAGES_IDLE);
         this.animate();
@@ -50,37 +53,37 @@ class Character extends MovableObject {
 
     startMovementInterval() {
         setInterval(() => { // Charakter bewegen
-            this.move_sound.pause();
             const isMoving = this.handleMovement();
             if (isMoving) {
                 this.hasMoved = true; // Setzt die Variable, dass der Charakter sich bewegt hat
                 this.playAnimation(this.IMAGES_MOVE);
+                if (this.idleInterval) {
+                    clearInterval(this.idleInterval); // Idle-Animation stoppen
+                    this.idleInterval = null; // Referenz aufheben
+                }
             }
         }, 1000 / 10);
     }
 
     handleMovement() {
-        let isMoving = false;
-        if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+        let isMoving = false; // Initialisierung der isMoving-Variable
+    
+        if (this.world.keyboard.RIGHT && this.x + this.width < this.maxRight) {
             this.x += this.speed;
             this.otherDirection = false;
-            this.move_sound.play();
             isMoving = true;
         }
         if (this.world.keyboard.LEFT && this.x > 0) {
             this.x -= this.speed;
             this.otherDirection = true;
-            this.move_sound.play();
             isMoving = true;
         }
-        if (this.world.keyboard.DOWN) {
+        if (this.world.keyboard.DOWN && this.y + this.height < this.canvasHeight) {
             this.y += this.speed;
-            this.move_sound.play();
             isMoving = true;
         }
-        if (this.world.keyboard.UP) {
+        if (this.world.keyboard.UP && this.y > 0) {
             this.y -= this.speed;
-            this.move_sound.play();
             isMoving = true;
         }
         this.world.camera_x = -this.x + 100;
@@ -89,23 +92,24 @@ class Character extends MovableObject {
 
     startMoveAnimationInterval() {
         setInterval(() => { // Move animation
-            if (this.hasMoved && (this.world.keyboard.RIGHT || this.world.keyboard.LEFT || this.world.keyboard.UP || this.world.keyboard.DOWN)) {
+            if (this.hasMoved) {
                 this.playAnimation(this.IMAGES_MOVE);
             }
         }, 300); // Geschwindigkeit der Move-Animation
     }
 
     playIdleAnimation() {
-        this.currentImage = 0; 
-        let idleYDirection = 1; 
+        this.currentImage = 0;
+        let idleYDirection = 1;
         const idleAmplitude = 30; // Amplitude der vertikalen Bewegung
-        const initialY = this.y; 
-        const idleInterval = setInterval(() => {
+        const initialY = this.y;
+        this.idleInterval = setInterval(() => { // Idle-Intervall speichern
             this.img = this.imageCache[this.IMAGES_IDLE[this.currentImage % this.IMAGES_IDLE.length]];
             this.currentImage++;
             this.y += idleYDirection * 0.6; // Geschwindigkeit der Bewegung
             if (this.hasMoved) {
-                clearInterval(idleInterval);
+                clearInterval(this.idleInterval);
+                this.playAnimation(this.IMAGES_MOVE); // Move-Animation starten, wenn Idle-Animation beendet ist
             }
         }, 150); // Geschwindigkeit der Idle-Animation
     }
