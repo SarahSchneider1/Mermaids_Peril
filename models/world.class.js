@@ -46,7 +46,7 @@ class World {
 
     startBackgroundMusic() {
         this.backgroundMusic.loop = true; // Musik in einer Schleife abspielen
-        this.backgroundMusic.volume = 0.5; // Lautstärke auf 50% setzen
+        this.backgroundMusic.volume = 0.0; // Lautstärke auf 50% setzen
         this.backgroundMusic.play().catch(error => {
             console.log('Audio playback failed:', error);
         });

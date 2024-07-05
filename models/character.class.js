@@ -73,8 +73,8 @@ class Character extends MovableObject {
         this.loadImage(this.IMAGES_IDLE[0]);
         this.loadImages(this.IMAGES_MOVE);
         this.loadImages(this.IMAGES_IDLE);
-        this.loadImages(this.IMAGES_HIT); // Trefferbilder laden
-        this.loadImages(this.IMAGES_DEAD); // Todesbilder laden
+        this.loadImages(this.IMAGES_HIT); 
+        this.loadImages(this.IMAGES_DEAD); 
         this.animate();
         this.playIdleAnimation(); // Idle-Animation am Anfang starten
     }
@@ -125,7 +125,9 @@ class Character extends MovableObject {
 
     startMoveAnimationInterval() {
         setInterval(() => { // Move animation
-            if (this.hasMoved) {
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD);
+            } else if (this.hasMoved) {
                 this.playAnimation(this.IMAGES_MOVE);
             }
         }, 300); // Geschwindigkeit der Move-Animation

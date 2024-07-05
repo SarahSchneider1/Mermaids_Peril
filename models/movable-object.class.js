@@ -9,6 +9,7 @@ class MovableObject {
     speed = 0.15;
     otherDirection = false; // Spiegeln
     energy = 100;
+    lastHit = 0;
 
     loadImage(path) {
         this.img = new Image();
@@ -63,7 +64,14 @@ class MovableObject {
         this.energy -= 5;
         if(this.energy < 0) {
             this.energy = 0;
+        } else {
+            this.lastHit =  new Date().getTime();
         }
+    }
+
+    isHurt() {
+        let timepassed = new Date().getTime() - this.lastHit; //Differenz in Millisekunden
+        return timepassed < 1;
     }
 
     isDead() {
