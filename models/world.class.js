@@ -6,6 +6,9 @@ class World {
     keyboard;
     camera_x = 0;
     backgroundMusic = new Audio('audio/gamesound.mp3');
+    statusBarLife = new StatusBarLife();
+    statusBarCoins = new StatusBarCoins();
+    statusBarDrink = new StatusBarDrink();
 
     constructor(canvas, keyboard) {
         this.ctx = canvas.getContext('2d');
@@ -27,11 +30,14 @@ class World {
             this.level.enemies.forEach((enemy) => {
                 if (this.character.isColliding(enemy)) {
                     this.character.hit();
-                    console.log('Collision with character, energy:', this.character.energy);
+                    this.statusBarLife.setPercentage(this.character.energy);
+                    // this.statusBarCoins.setPercentage(newCoinPercentage);
+                    // this.statusBarDrink.setPercentage(newDrinkPercentage);
                 }
             });
         }, 200);
     }
+    
 
     addEventListeners() {
         // Event-Listener für Benutzerinteraktionen hinzufügen
@@ -46,7 +52,7 @@ class World {
 
     startBackgroundMusic() {
         this.backgroundMusic.loop = true; // Musik in einer Schleife abspielen
-        this.backgroundMusic.volume = 0.0; // Lautstärke auf 50% setzen
+        this.backgroundMusic.volume = 0.0; // Lautstärke auf 0% setzen
         this.backgroundMusic.play().catch(error => {
             console.log('Audio playback failed:', error);
         });
@@ -58,6 +64,22 @@ class World {
         this.ctx.translate(this.camera_x, 0);
 
         this.addObjectsToMap(this.level.backgroundObjects);
+
+        this.ctx.translate(-this.camera_x, 0); // Space to fixed objects
+
+        // Alle StatusBars zeichnen, wenn sie existieren
+        if (this.statusBarLife) {
+            this.addToMap(this.statusBarLife);
+        }
+        if (this.statusBarCoins) {
+            this.addToMap(this.statusBarCoins);
+        }
+        if (this.statusBarDrink) {
+            this.addToMap(this.statusBarDrink);
+        }
+
+        this.ctx.translate(this.camera_x, 0);
+
         this.addToMap(this.character); // Charakter zur Karte hinzufügen
         this.addObjectsToMap(this.level.enemies);
 
