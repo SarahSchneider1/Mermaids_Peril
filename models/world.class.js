@@ -10,7 +10,10 @@ class World {
     statusBarCoins = new StatusBarCoins();
     statusBarDrink = new StatusBarDrink();
     throwableObject = [];
-    coins = [];
+    coins = []; 
+    collectedCoins = 0;
+    bottles = []; 
+    collectedBottles = 0;
 
     constructor(canvas, keyboard) {
         this.ctx = canvas.getContext('2d');
@@ -20,6 +23,7 @@ class World {
         this.setWorld();
         this.addEventListeners(); // Event-Listener hinzufügen
         this.distributeCoins();
+        this.distributeBottles();
         this.draw();
         this.swim();
     }
@@ -32,14 +36,17 @@ class World {
         setInterval(() => {
             this.checkCollisions();
             this.checkThrowObjects();
+            this.checkCoinCollisions(); // Überprüfe Kollisionen mit Coins
+            this.checkBottleCollisions(); // Überprüfe Kollisionen mit Bottles
         }, 200);
     }
 
     checkThrowObjects() {
-        if (this.keyboard.SPACE) {
-            let bubble = new ThrowableObject(this.character.x + 100, this.character.y  + 100);
+        if (this.keyboard.SPACE && this.collectedBottles > 0) { // Überprüfe, ob Bottles gesammelt wurden
+            let bubble = new ThrowableObject(this.character.x + 100, this.character.y + 100);
             this.throwableObject.push(bubble);
-
+            this.collectedBottles -= 1; // Verringere die Anzahl der gesammelten Bottles
+            this.statusBarDrink.setPercentage(this.collectedBottles * 10); // Aktualisiere die StatusBar
         }
     }
 
@@ -48,10 +55,48 @@ class World {
             if (this.character.isColliding(enemy)) {
                 this.character.hit();
                 this.statusBarLife.setPercentage(this.character.energy);
-                // this.statusBarCoins.setPercentage(newCoinPercentage);
-                // this.statusBarDrink.setPercentage(newDrinkPercentage);
             }
         });
+    }
+
+    checkCoinCollisions() {
+        this.coins.forEach((coin, index) => {
+            if (this.character.isColliding(coin)) {
+                this.coins.splice(index, 1); // Entferne den eingesammelten Coin
+                this.collectedCoins += 1;
+                let percentage = Math.min(this.collectedCoins * 10, 100); // 10 Coins entsprechen 100%
+                this.statusBarCoins.setPercentage(percentage);
+            }
+        });
+    }
+
+    checkBottleCollisions() {
+        this.bottles.forEach((bottle, index) => {
+            if (this.character.isColliding(bottle)) {
+                this.bottles.splice(index, 1); // Entferne die eingesammelte Bottle
+                this.collectedBottles += 1;
+                let percentage = Math.min(this.collectedBottles * 10, 100); // 10 Bottles entsprechen 100%
+                this.statusBarDrink.setPercentage(percentage);
+            }
+        });
+    }
+
+    distributeCoins() {
+        for (let i = 0; i < 20; i++) {
+            let x = Math.random() * 2500; // Zufällige x-Position innerhalb der 2500 Pixel Breite
+            let y = Math.random() * this.canvas.height; // Zufällige y-Position innerhalb der Canvas-Höhe
+            let coin = new Coin(x, y);
+            this.coins.push(coin);
+        }
+    }
+
+    distributeBottles() {
+        for (let i = 0; i < 10; i++) {
+            let x = Math.random() * 2500; // Zufällige x-Position innerhalb der 2500 Pixel Breite
+            let y = Math.random() * this.canvas.height; // Zufällige y-Position innerhalb der Canvas-Höhe
+            let bottle = new Bottle(x, y);
+            this.bottles.push(bottle);
+        }
     }
 
     addEventListeners() {
@@ -71,6 +116,15 @@ class World {
             let y = Math.random() * this.canvas.height; // Zufällige y-Position innerhalb der Canvas-Höhe
             let coin = new Coin(x, y);
             this.coins.push(coin);
+        }
+    }
+
+    distributeBottles() {
+        for (let i = 0; i < 10; i++) {
+            let x = Math.random() * 2500; // Zufällige x-Position innerhalb der 2500 Pixel Breite
+            let y = Math.random() * this.canvas.height; // Zufällige y-Position innerhalb der Canvas-Höhe
+            let bottle = new Bottle(x, y);
+            this.bottles.push(bottle);
         }
     }
 
@@ -108,8 +162,9 @@ class World {
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObject);
 
-        // Füge diese Zeile hinzu, um die Coins zu zeichnen
+        // Füge diese Zeile hinzu, um die Coins und Bottles zu zeichnen
         this.addObjectsToMap(this.coins);
+        this.addObjectsToMap(this.bottles);
 
         this.ctx.translate(-this.camera_x, 0);
 

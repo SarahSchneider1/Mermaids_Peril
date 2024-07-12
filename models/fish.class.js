@@ -1,6 +1,6 @@
 class Fish extends MovableObject {
-    width = 70;
-    height = 70;
+    width = 60;
+    height = 60;
     IMAGES_MOVE = [
         'img/Fish, crab, jellyfish, shark/PNG/Fish_2/Fish_move_2_000.png',
         'img/Fish, crab, jellyfish, shark/PNG/Fish_2/Fish_move_2_001.png',

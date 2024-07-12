@@ -5,8 +5,8 @@ class Coin extends MovableObject {
         'img/Alternative Grafiken - Sharkie/4. Marcadores/1. Coins/2.png',
         'img/Alternative Grafiken - Sharkie/4. Marcadores/1. Coins/1.png'
     ];
-    width = 35;
-    height = 35;
+    width = 30;
+    height = 30;
 
     constructor(x, y) {
         super();

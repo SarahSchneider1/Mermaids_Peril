@@ -1,6 +1,6 @@
 class Jellyfish extends MovableObject {
-    height = 90;
-    width = 90;
+    height = 80;
+    width = 80;
     IMAGES_MOVE = [
         'img/Fish, crab, jellyfish, shark/PNG/Jellyfish_1/Jellyfish_move_1_000.png',
         'img/Fish, crab, jellyfish, shark/PNG/Jellyfish_1/Jellyfish_move_1_001.png',

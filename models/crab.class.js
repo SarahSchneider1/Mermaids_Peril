@@ -1,6 +1,6 @@
 class Crab extends MovableObject {
-    height = 100;
-    width = 100;
+    height = 90;
+    width = 90;
     y = 350;
     IMAGES_MOVE = [
         'img/Fish, crab, jellyfish, shark/PNG/Crab_1/Crab_move_1_000.png',
