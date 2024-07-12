@@ -66,6 +66,7 @@ class Character extends MovableObject {
     hitTimeout = null;  // Referenz auf das Hit-Timeout
     deadTimeout = null; // Referenz auf das Dead-Timeout
     maxRight = 2400;
+    dead = false;
 
     constructor(world) {
         super();
@@ -125,7 +126,7 @@ class Character extends MovableObject {
 
     startMoveAnimationInterval() {
         setInterval(() => { // Move animation
-            if (this.isDead()) {
+            if (this.dead) {
                 this.playAnimation(this.IMAGES_DEAD);
             } else if (this.hasMoved) {
                 this.playAnimation(this.IMAGES_MOVE);
@@ -134,7 +135,6 @@ class Character extends MovableObject {
     }
 
     playIdleAnimation() {
-        this.currentImage = 0;
         let idleYDirection = 1;
         const idleAmplitude = 30; // Amplitude der vertikalen Bewegung
         const initialY = this.y;
@@ -150,40 +150,52 @@ class Character extends MovableObject {
     }
 
     playHitAnimation() {
-        if (this.hitTimeout) {
-            clearTimeout(this.hitTimeout); // Bereits laufendes Hit-Timeout stoppen
-        }
-        this.currentImage = 0;
-        const hitDuration = this.IMAGES_HIT.length * 200;
-        this.playAnimation(this.IMAGES_HIT);
-        this.hitTimeout = setTimeout(() => {
-            this.hitTimeout = null; // Timeout-Referenz aufheben
-            if (this.energy <= 0) {
-                this.playDeadAnimation(); // Todes-Animation abspielen, wenn Energie null ist
-            } else {
-                this.playIdleAnimation(); // Idle-Animation abspielen
+        if (!this.dead) { // Nur wenn der Charakter nicht tot ist
+            if (this.hitTimeout) {
+                clearTimeout(this.hitTimeout); // Bereits laufendes Hit-Timeout stoppen
             }
-        }, hitDuration);
+            const hitDuration = this.IMAGES_HIT.length * 200;
+            this.playAnimation(this.IMAGES_HIT);
+            this.hitTimeout = setTimeout(() => {
+                this.hitTimeout = null; // Timeout-Referenz aufheben
+                if (this.energy <= 0) {
+                    this.playDeadAnimation(); // Todes-Animation abspielen, wenn Energie null ist
+                } else {
+                    this.playIdleAnimation(); // Idle-Animation abspielen
+                }
+            }, hitDuration);
+        }
     }
 
     playDeadAnimation() {
         if (this.deadTimeout) {
             clearTimeout(this.deadTimeout); // Bereits laufendes Dead-Timeout stoppen
         }
-        this.currentImage = 0;
-        const deadDuration = this.IMAGES_DEAD.length * 200;
-        this.playAnimation(this.IMAGES_DEAD);
-        this.deadTimeout = setTimeout(() => {
-            this.deadTimeout = null; // Timeout-Referenz aufheben
-        }, deadDuration);
+    
+        const lastImageIndex = this.IMAGES_DEAD.length - 1;
+        let currentFrame = 0;
+    
+        const deadInterval = setInterval(() => {
+            this.img = this.imageCache[this.IMAGES_DEAD[currentFrame]];
+            currentFrame++;
+    
+            if (currentFrame > lastImageIndex) {
+                clearInterval(deadInterval);
+                this.img = this.imageCache[this.IMAGES_DEAD[lastImageIndex]]; // Letztes Bild setzen
+                this.dead = true; // Flag setzen, dass der Charakter tot ist
+            }
+        }, 200);
     }
 
-    hit() {
-        super.hit(); // Energie verringern
-        if (this.energy <= 0) { // Prüfen, ob der Charakter tot ist
-            this.playDeadAnimation(); // Todes-Animation abspielen
-        } else {
-            this.playHitAnimation(); // Treffer-Animation abspielen
-        }
-    }
+//     hit() {
+//         if (!this.dead) { // Nur wenn der Charakter nicht tot ist
+//             super.hit(); // Energie verringern
+//             if (this.energy <= 0) { // Prüfen, ob der Charakter tot ist
+//                 this.playDeadAnimation(); // Todes-Animation abspielen
+//             } else {
+//                 this.playHitAnimation(); // Treffer-Animation abspielen
+//             }
+//         }
+//     }
+// }
 }

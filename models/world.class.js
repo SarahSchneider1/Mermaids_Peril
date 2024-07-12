@@ -9,6 +9,8 @@ class World {
     statusBarLife = new StatusBarLife();
     statusBarCoins = new StatusBarCoins();
     statusBarDrink = new StatusBarDrink();
+    throwableObject = [];
+    coins = [];
 
     constructor(canvas, keyboard) {
         this.ctx = canvas.getContext('2d');
@@ -17,27 +19,40 @@ class World {
         this.draw = this.draw.bind(this);
         this.setWorld();
         this.addEventListeners(); // Event-Listener hinzufügen
+        this.distributeCoins();
         this.draw();
-        this.checkCollisions();
+        this.swim();
     }
 
     setWorld() {
         this.character.world = this;
     }
 
-    checkCollisions() {
+    swim() {
         setInterval(() => {
-            this.level.enemies.forEach((enemy) => {
-                if (this.character.isColliding(enemy)) {
-                    this.character.hit();
-                    this.statusBarLife.setPercentage(this.character.energy);
-                    // this.statusBarCoins.setPercentage(newCoinPercentage);
-                    // this.statusBarDrink.setPercentage(newDrinkPercentage);
-                }
-            });
+            this.checkCollisions();
+            this.checkThrowObjects();
         }, 200);
     }
-    
+
+    checkThrowObjects() {
+        if (this.keyboard.SPACE) {
+            let bubble = new ThrowableObject(this.character.x + 100, this.character.y  + 100);
+            this.throwableObject.push(bubble);
+
+        }
+    }
+
+    checkCollisions() {
+        this.level.enemies.forEach((enemy) => {
+            if (this.character.isColliding(enemy)) {
+                this.character.hit();
+                this.statusBarLife.setPercentage(this.character.energy);
+                // this.statusBarCoins.setPercentage(newCoinPercentage);
+                // this.statusBarDrink.setPercentage(newDrinkPercentage);
+            }
+        });
+    }
 
     addEventListeners() {
         // Event-Listener für Benutzerinteraktionen hinzufügen
@@ -50,9 +65,18 @@ class World {
         }, { once: true });
     }
 
+    distributeCoins() {
+        for (let i = 0; i < 10; i++) {
+            let x = Math.random() * 2500; // Zufällige x-Position innerhalb der 2500 Pixel Breite
+            let y = Math.random() * this.canvas.height; // Zufällige y-Position innerhalb der Canvas-Höhe
+            let coin = new Coin(x, y);
+            this.coins.push(coin);
+        }
+    }
+
     startBackgroundMusic() {
         this.backgroundMusic.loop = true; // Musik in einer Schleife abspielen
-        this.backgroundMusic.volume = 0.0; // Lautstärke auf 0% setzen
+        this.backgroundMusic.volume = 0.0; // Lautstärke auf 100% setzen
         this.backgroundMusic.play().catch(error => {
             console.log('Audio playback failed:', error);
         });
@@ -80,13 +104,18 @@ class World {
 
         this.ctx.translate(this.camera_x, 0);
 
-        this.addToMap(this.character); // Charakter zur Karte hinzufügen
+        this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
+        this.addObjectsToMap(this.throwableObject);
+
+        // Füge diese Zeile hinzu, um die Coins zu zeichnen
+        this.addObjectsToMap(this.coins);
 
         this.ctx.translate(-this.camera_x, 0);
 
         requestAnimationFrame(this.draw);
     }
+
 
     addObjectsToMap(objects) {
         objects.forEach(o => {

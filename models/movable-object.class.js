@@ -3,6 +3,22 @@ class MovableObject extends DrawableObject {
     otherDirection = false; // Spiegeln
     energy = 100;
     lastHit = 0;
+    speedY = 0;
+    acceleration = 2.5;
+
+    // applyGravity() {
+    //     setInterval(() => {
+    //         if (this.isAboveGround() || this.speedY > 0) {  
+    //             this.y -= this.speedY; 
+    //             this.speedY -= this.acceleration;
+    //         }
+    //     }, 1000 / 25);  
+    // }
+    
+    // isAboveGround() {
+    //     return this.y > 0;  
+    // }
+    
 
     playAnimation(images) {
         let i = this.currentImage % images.length;
@@ -17,11 +33,18 @@ class MovableObject extends DrawableObject {
     }
 
     hit() {
-        this.energy -= 5;
-        if(this.energy < 0) {
-            this.energy = 0;
-        } else {
-            this.lastHit =  new Date().getTime();
+        if (this.energy > 0) {
+            this.energy -= 5;
+            if (this.energy < 0) {
+                this.energy = 0;
+            } else {
+                this.lastHit = new Date().getTime();
+            }
+            if (this.energy === 0) {
+                this.playDeadAnimation();
+            } else {
+                this.playHitAnimation();
+            }
         }
     }
 
