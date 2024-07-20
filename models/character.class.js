@@ -1,5 +1,4 @@
 class Character extends MovableObject {
-    // Eigenschaften
     height = 170;
     width = 170;
     x = 100;
@@ -60,13 +59,28 @@ class Character extends MovableObject {
         'img/Mermaid/PNG/Mermaid_1/Die_009.png',
     ];
 
+    IMAGES_BUBBLE = [
+        'img/Mermaid/PNG/Mermaid_1/Attack_000.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_001.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_002.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_003.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_004.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_005.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_006.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_007.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_008.png',
+        'img/Mermaid/PNG/Mermaid_1/Attack_009.png',
+    ];
+
     currentImage = 0;
     hasMoved = false;
-    idleInterval = null; // Referenz auf das Idle-Intervall
-    hitTimeout = null;  // Referenz auf das Hit-Timeout
-    deadTimeout = null; // Referenz auf das Dead-Timeout
+    idleInterval = null; 
+    hitTimeout = null;  
+    deadTimeout = null; 
     maxRight = 2400;
     dead = false;
+    collectedBottles = 0; 
+    isPlayingBubbleAnimation = false;
 
     constructor(world) {
         super();
@@ -74,10 +88,11 @@ class Character extends MovableObject {
         this.loadImage(this.IMAGES_IDLE[0]);
         this.loadImages(this.IMAGES_MOVE);
         this.loadImages(this.IMAGES_IDLE);
-        this.loadImages(this.IMAGES_HIT); 
-        this.loadImages(this.IMAGES_DEAD); 
+        this.loadImages(this.IMAGES_HIT);
+        this.loadImages(this.IMAGES_DEAD);
+        super.loadImages(this.IMAGES_BUBBLE);
         this.animate();
-        this.playIdleAnimation(); // Idle-Animation am Anfang starten
+        this.playIdleAnimation(); 
     }
 
     animate() {
@@ -86,21 +101,21 @@ class Character extends MovableObject {
     }
 
     startMovementInterval() {
-        setInterval(() => { // Charakter bewegen
+        setInterval(() => { 
             const isMoving = this.handleMovement();
             if (isMoving) {
-                this.hasMoved = true; // Setzt die Variable, dass der Charakter sich bewegt hat
-                this.playAnimation(this.IMAGES_MOVE);
+                this.hasMoved = true; 
+                this.playMoveAnimation();
                 if (this.idleInterval) {
-                    clearInterval(this.idleInterval); // Idle-Animation stoppen
-                    this.idleInterval = null; // Referenz aufheben
+                    clearInterval(this.idleInterval);
+                    this.idleInterval = null; 
                 }
             }
-        }, 1000 / 10);
+        }, 100); 
     }
 
     handleMovement() {
-        let isMoving = false; // Initialisierung der isMoving-Variable
+        let isMoving = false;
     
         if (this.world.keyboard.RIGHT && this.x + this.width < this.maxRight) {
             this.x += this.speed;
@@ -120,82 +135,128 @@ class Character extends MovableObject {
             this.y -= this.speed;
             isMoving = true;
         }
+        if (this.world.keyboard.SPACE && !this.isPlayingBubbleAnimation) {
+            this.playBubbleAnimation();
+        }
         this.world.camera_x = -this.x + 100;
         return isMoving;
     }
 
     startMoveAnimationInterval() {
         setInterval(() => { // Move animation
-            if (this.dead) {
-                this.playAnimation(this.IMAGES_DEAD);
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD, null, 200); 
             } else if (this.hasMoved) {
-                this.playAnimation(this.IMAGES_MOVE);
+                this.playAnimation(this.IMAGES_MOVE, null, 20); 
             }
-        }, 300); // Geschwindigkeit der Move-Animation
+        }, 700);
+    }
+
+    playAnimation(images, onComplete = null, intervalTime = 400) {
+        let currentImage = 0;
+        const interval = setInterval(() => {
+            this.img = this.imageCache[images[currentImage]];
+            currentImage++;
+            if (currentImage >= images.length) {
+                clearInterval(interval);
+                if (onComplete) {
+                    onComplete();
+                }
+            }
+        }, intervalTime); 
     }
 
     playIdleAnimation() {
         let idleYDirection = 1;
-        const idleAmplitude = 30; // Amplitude der vertikalen Bewegung
+        const idleAmplitude = 30; 
         const initialY = this.y;
-        this.idleInterval = setInterval(() => { // Idle-Intervall speichern
+        this.idleInterval = setInterval(() => { 
             this.img = this.imageCache[this.IMAGES_IDLE[this.currentImage % this.IMAGES_IDLE.length]];
             this.currentImage++;
             this.y += idleYDirection * 0.6; // Geschwindigkeit der Bewegung
             if (this.hasMoved) {
                 clearInterval(this.idleInterval);
-                this.playAnimation(this.IMAGES_MOVE); // Move-Animation starten, wenn Idle-Animation beendet ist
+                this.playMoveAnimation(); // Move-Animation starten, wenn Idle-Animation beendet ist
             }
-        }, 150); // Geschwindigkeit der Idle-Animation
+        }, 150); 
     }
 
     playHitAnimation() {
-        if (!this.dead) { // Nur wenn der Charakter nicht tot ist
-            if (this.hitTimeout) {
-                clearTimeout(this.hitTimeout); // Bereits laufendes Hit-Timeout stoppen
-            }
-            const hitDuration = this.IMAGES_HIT.length * 200;
-            this.playAnimation(this.IMAGES_HIT);
-            this.hitTimeout = setTimeout(() => {
-                this.hitTimeout = null; // Timeout-Referenz aufheben
-                if (this.energy <= 0) {
-                    this.playDeadAnimation(); // Todes-Animation abspielen, wenn Energie null ist
-                } else {
-                    this.playIdleAnimation(); // Idle-Animation abspielen
-                }
-            }, hitDuration);
+        if (this.hitTimeout) {
+            clearTimeout(this.hitTimeout); // Bereits laufendes Hit-Timeout stoppen
         }
+        this.currentImage = 0;
+        this.playAnimation(this.IMAGES_HIT, () => {
+            this.hitTimeout = null; // Timeout-Referenz aufheben
+            if (this.energy <= 0) {
+                this.playDeadAnimation(); 
+            } else {
+                this.playMoveAnimation(); 
+            }
+        }, 50); 
     }
 
     playDeadAnimation() {
         if (this.deadTimeout) {
-            clearTimeout(this.deadTimeout); // Bereits laufendes Dead-Timeout stoppen
+            clearTimeout(this.deadTimeout); 
         }
     
-        const lastImageIndex = this.IMAGES_DEAD.length - 1;
-        let currentFrame = 0;
-    
-        const deadInterval = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_DEAD[currentFrame]];
-            currentFrame++;
-    
-            if (currentFrame > lastImageIndex) {
-                clearInterval(deadInterval);
-                this.img = this.imageCache[this.IMAGES_DEAD[lastImageIndex]]; // Letztes Bild setzen
-                this.dead = true; // Flag setzen, dass der Charakter tot ist
-            }
-        }, 200);
+        this.playAnimation(this.IMAGES_DEAD, () => {
+            this.deadTimeout = null; 
+           
+        }, 250); 
     }
 
-//     hit() {
-//         if (!this.dead) { // Nur wenn der Charakter nicht tot ist
-//             super.hit(); // Energie verringern
-//             if (this.energy <= 0) { // Prüfen, ob der Charakter tot ist
-//                 this.playDeadAnimation(); // Todes-Animation abspielen
-//             } else {
-//                 this.playHitAnimation(); // Treffer-Animation abspielen
-//             }
-//         }
-//     }
-// }
+    playMoveAnimation() {
+        this.currentImage = 0;
+        this.playAnimation(this.IMAGES_MOVE);
+    }
+
+    playBubbleAnimation() {
+        if (this.isPlayingBubbleAnimation) {
+            console.log('Bubble-Animation bereits im Gange');
+            return;
+        }
+        console.log('playBubbleAnimation aufgerufen');
+        if (!this.dead && this.collectedBottles > 0) { 
+            console.log('Genügend Bottles gesammelt und Charakter nicht tot');
+            this.isPlayingBubbleAnimation = true; 
+            let bubbleThrowIndex = 5; 
+            this.currentImage = 0;
+    
+            const interval = setInterval(() => {
+                console.log('Bubble-Animation Frame:', this.currentImage);
+                this.img = this.imageCache[this.IMAGES_BUBBLE[this.currentImage]];
+                if (this.currentImage === bubbleThrowIndex) {
+                    this.throwBubble(); // Bubble beim richtigen Frame werfen
+                }
+                this.currentImage++;
+                if (this.currentImage >= this.IMAGES_BUBBLE.length) {
+                    clearInterval(interval);
+                    this.playMoveAnimation(); // Move-Animation abspielen
+                    this.isPlayingBubbleAnimation = false; 
+                    console.log('Bubble-Animation beendet');
+                }
+            }, 500); 
+        } else {
+            console.log('Nicht genügend Bottles gesammelt oder Charakter tot');
+        }
+    }
+    
+    
+    throwBubble() {
+        if (this.collectedBottles > 0) {
+            this.collectedBottles--; // Reduziert die Anzahl der gesammelten Bottles
+            new ThrowableObject(this.x, this.y);
+            console.log('throwBubble');
+        }
+    }
+
+    collectBottle() {
+        this.collectedBottles++;
+        console.log('Flasche gesammelt, Anzahl der Bottles:', this.collectedBottles);
+    }
+
+
+
 }

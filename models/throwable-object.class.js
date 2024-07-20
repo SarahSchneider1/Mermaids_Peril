@@ -1,19 +1,16 @@
 class ThrowableObject extends MovableObject {
-
     constructor(x, y) {
         super().loadImage('img/Game items/PNG/Neutral/Bubble_1.png');
         this.x = x;
         this.y = y;
-        this.height = 40;
-        this.width = 40;
-        this.throw();  // Funktionsname korrigiert
+        this.height = 20;
+        this.width = 20;
+        this.throw();
     }
 
-    throw() {  // Funktionsname korrigiert
-        this.speedY = 0;  // Vertikale Geschwindigkeit auf 0 gesetzt
+    throw() {
         setInterval(() => {
             this.x += 10;
         }, 50);
     }
-
 }

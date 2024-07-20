@@ -40,15 +40,16 @@ class World {
             this.checkBottleCollisions(); // Überprüfe Kollisionen mit Bottles
         }, 200);
     }
-
     checkThrowObjects() {
-        if (this.keyboard.SPACE && this.collectedBottles > 0) { // Überprüfe, ob Bottles gesammelt wurden
+        if (this.keyboard && this.keyboard.SPACE && this.collectedBottles > 0) {
             let bubble = new ThrowableObject(this.character.x + 100, this.character.y + 100);
             this.throwableObject.push(bubble);
-            this.collectedBottles -= 1; // Verringere die Anzahl der gesammelten Bottles
-            this.statusBarDrink.setPercentage(this.collectedBottles * 10); // Aktualisiere die StatusBar
+            this.collectedBottles -= 1;
+            this.statusBarDrink.setPercentage(this.collectedBottles * 10);
+            this.character.playBubbleAnimation();
         }
     }
+
 
     checkCollisions() {
         this.level.enemies.forEach((enemy) => {
@@ -132,7 +133,6 @@ class World {
         this.backgroundMusic.loop = true; // Musik in einer Schleife abspielen
         this.backgroundMusic.volume = 0.0; // Lautstärke auf 100% setzen
         this.backgroundMusic.play().catch(error => {
-            console.log('Audio playback failed:', error);
         });
     }
 
