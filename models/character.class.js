@@ -92,12 +92,24 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_DEAD);
         super.loadImages(this.IMAGES_BUBBLE);
         this.animate();
+        this.startMovementInterval();
         this.playIdleAnimation(); 
     }
 
     animate() {
-        this.startMovementInterval();
-        this.startMoveAnimationInterval();
+        setInterval(() => {
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD, null, 200); 
+            } else if (this.hasMoved) {
+                this.playAnimation(this.IMAGES_MOVE, null, 20); 
+            } else if (this.isPlayingBubbleAnimation) {
+                this.playBubbleAnimation();
+            } else if (this.isHit()) {
+                this.playHitAnimation();
+            } else {
+                this.playIdleAnimation();
+            }
+        }, 700);
     }
 
     startMovementInterval() {
@@ -135,21 +147,18 @@ class Character extends MovableObject {
             this.y -= this.speed;
             isMoving = true;
         }
-        if (this.world.keyboard.SPACE && !this.isPlayingBubbleAnimation) {
-            this.playBubbleAnimation();
+        if (this.world.keyboard.SPACE) {
+            console.log('SPACE key pressed');
+            if (!this.isPlayingBubbleAnimation) {
+                console.log('Bubble animation not playing');
+                this.isPlayingBubbleAnimation = true;
+                this.playBubbleAnimation();
+            } else {
+                console.log('Bubble animation already playing');
+            }
         }
         this.world.camera_x = -this.x + 100;
         return isMoving;
-    }
-
-    startMoveAnimationInterval() {
-        setInterval(() => { // Move animation
-            if (this.isDead()) {
-                this.playAnimation(this.IMAGES_DEAD, null, 200); 
-            } else if (this.hasMoved) {
-                this.playAnimation(this.IMAGES_MOVE, null, 20); 
-            }
-        }, 700);
     }
 
     playAnimation(images, onComplete = null, intervalTime = 400) {
@@ -256,7 +265,4 @@ class Character extends MovableObject {
         this.collectedBottles++;
         console.log('Flasche gesammelt, Anzahl der Bottles:', this.collectedBottles);
     }
-
-
-
 }

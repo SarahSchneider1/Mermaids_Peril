@@ -49,4 +49,11 @@ class Fish2 extends MovableObject {
     moveLeft() {
         this.x -= this.speed;
     }
+
+    hit() {
+        this.energy -= 100; // Reduziere die Energie um 25 (oder einen anderen Wert)
+        if (this.energy < 0) {
+            this.energy = 0; // Stelle sicher, dass die Energie nicht negativ wird
+        }
+    }
 }
